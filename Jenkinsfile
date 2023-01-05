@@ -1,30 +1,17 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:lts-buster-slim'
-            args '-p 3000:3000'
+    agent none
+  stages {
+    stage('Docker pull') {
+        agent any
+      steps {
+          sh 'docker pull aritzmetal/todoapp:v4'
+      }
+    }
+    stage('Docker Run') {
+        agent any
+      steps {
+            sh "docker run -p 82:3000 --name tod aritzmetal/todoapp:v4"
         }
     }
-    environment {
-        CI = 'true'
-    }
-    stages {
-        stage('Build') {
-            steps {
-                sh 'npm install'
-            }
-        }
-        stage('Test') {
-            steps {
-                sh './jenkins/scripts/test.sh'
-            }
-        }
-        stage('Deliver') {
-            steps {
-                sh './jenkins/scripts/deliver.sh'
-                input message: 'Finished using the web site? (Click "Proceed" to continue)'
-                sh './jenkins/scripts/kill.sh'
-            }
-        }
-    }
+}
 }
